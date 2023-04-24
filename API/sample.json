@@ -1,0 +1,13 @@
+{
+  "Builder": 0,
+  "Dealer": 0,
+  "Owner": 1,
+  "UNDER_CONSTRUCTION": 0,
+  "RERA": 0,
+  "BHK_NO": 2,
+  "SQUARE_FT": 1300.0,
+  "READY_TO_MOVE": 1,
+  "RESALE": 1,
+  "LONGITUDE": 13.0,
+  "LATITUDE": 77.5
+}
