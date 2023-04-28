@@ -42,9 +42,9 @@ const Prediction = () => {
 
   const [prediction, setPrediction] = useState(null);
   const [formData, setFormData] = useState({
-    Builder: "",
-    Dealer: "",
-    Owner: "",
+    Builder: "1",
+    Dealer: "0",
+    Owner: "0",
     UNDER_CONSTRUCTION: "",
     RERA: "",
     BHK_NO: "",
@@ -57,37 +57,81 @@ const Prediction = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const data = {
+      Builder: parseInt(formData.Builder) || 0,
+      Dealer: parseInt(formData.Dealer) || 0,
+      Owner: parseInt(formData.Owner) || 0,
+      UNDER_CONSTRUCTION: parseInt(formData.UNDER_CONSTRUCTION) || 0,
+      RERA: parseInt(formData.RERA) || 0,
+      BHK_NO: parseInt(formData.BHK_NO) || 0,
+      SQUARE_FT: parseFloat(formData.SQUARE_FT) || 0,
+      READY_TO_MOVE: parseInt(formData.READY_TO_MOVE) || 0,
+      RESALE: parseInt(formData.RESALE) || 0,
+      LONGITUDE: parseFloat(formData.LONGITUDE) || 0,
+      LATITUDE: parseFloat(formData.LATITUDE) || 0,
+
+      // Builder: 1,
+      // Dealer: 0,
+      // Owner: 0,
+      // UNDER_CONSTRUCTION: 0,
+      // RERA: 0,
+      // BHK_NO: 2,
+      // SQUARE_FT: 1300.0,
+      // READY_TO_MOVE: 1,
+      // RESALE: 1,
+      // LONGITUDE: 13.0,
+      // LATITUDE: 77.5,
+    };
+    console.log(data);
     const response = await fetch("http://localhost:8000/house", {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(data),
     });
-    const data = await response.json();
-    setPrediction(data.prediction);
-    console.log("Form Data", formData);
-    console.log("Data", data);
+    const result = await response.json();
+    setPrediction(result.prediction);
+    console.log("Result", result);
   };
 
   const handleChange = async (event) => {
     const { name, value } = event.target;
     if (name === "address") {
-      const response = await fetch(`https://geocode.maps.co/search?q=${value}`);
+      // const value = "malad";
+      // const response = await fetch(`https://geocode.maps.co/search?q=${value}`);
+      // const data = await response.json();
+
+      // const location = data.results[0];
+      // console.log("location", location[0]);
+      // console.log("hello");
+
+      const GeoCode = (value) => `https://geocode.maps.co/search?q=${value}`;
+      // const { data } = await axios.get(GeoCode(value));
+      const response = await fetch(GeoCode(value));
       const data = await response.json();
-      const location = data.results[0];
+      const location = data[0];
+      // console.log("location", location);
       setFormData({
         ...formData,
         [name]: value,
-        LONGITUDE: location.lon,
-        LATITUDE: location.lat,
+        LONGITUDE: location?.lon,
+        LATITUDE: location?.lat,
       });
+      // console.log(
+      //   `Latitude: ${formData.LATITUDE}, Longitude: ${formData.LONGITUDE}`
+      // );
     } else if (name === "PostedBy") {
       setFormData({
         ...formData,
-        Builder: name === "PostedBy" && value === "Builder" ? "1" : "0",
-        Dealer: name === "PostedBy" && value === "Dealer" ? "1" : "0",
-        Owner: name === "PostedBy" && value === "Owner" ? "1" : "0",
+        Builder: name === "PostedBy" && value === "Builder" ? 1 : 0,
+        Dealer: name === "PostedBy" && value === "Dealer" ? 1 : 0,
+        Owner: name === "PostedBy" && value === "Owner" ? 1 : 0,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
       });
     }
   };
@@ -95,7 +139,7 @@ const Prediction = () => {
   return (
     <div>
       <Typography className={classes.title} variant="h3" align="center">
-        House Prediction
+        House Price Prediction
       </Typography>
 
       <div className={classes.section}>
@@ -204,15 +248,15 @@ const Prediction = () => {
 
       {prediction && (
         <div className={classes.section}>
-          <h3>Prediction:</h3>
-          <p
+          <h3>Prediction: </h3>
+          <h3
             style={{
               color: "#BB86FC",
               fontFamily: "Source Sans Pro",
             }}
           >
-            {prediction}
-          </p>
+            {prediction.toFixed(2)} Lakhs
+          </h3>
         </div>
       )}
     </div>
